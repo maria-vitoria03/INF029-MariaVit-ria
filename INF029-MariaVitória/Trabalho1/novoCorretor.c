@@ -12,11 +12,11 @@ void testQ5();
 void testQ6();
 
 int main(){
-    //testQ1(); // 10 testes
-    //testQ2(); // 35 testes
-    //testQ3(); // 13 testes
-    //testQ4(); // 22 testes
-    //testQ5(); // 10 testes
+    testQ1(); // 10 testes
+    testQ2(); // 35 testes
+    testQ3(); // 13 testes
+    testQ4(); // 22 testes
+    testQ5(); // 10 testes
     testQ6(); // 10 testes     
 }
 
