@@ -6,6 +6,7 @@
 
 int *vetorPrincipal[TAM];
 
+/*Função para inicializar o vetor principal*/
 int inicializarVetorPrincipal(int *vetPrincipal[]){
     for(int i = 0; i < TAM; i++){
         vetPrincipal[i] = NULL;
@@ -23,32 +24,29 @@ Rertono (int)
     SEM_ESPACO_DE_MEMORIA - Sem espaço de memória
     TAMANHO_INVALIDO - o tamanho deve ser maior ou igual a 1
 */
-int criarEstruturaAuxiliar(int posicao, int tamanho)
-{
-   if(posicao < 1 || posicao > 10){
-        // se posição é um valor válido {entre 1 e 10}
+int criarEstruturaAuxiliar(int posicao, int tamanho) {
+    if (posicao < 1 || posicao > TAM) {
         return POSICAO_INVALIDA;
     }
-
-    if(tamanho < 1){    
-        // o tamanho nao pode ser menor que 1
+    if (tamanho < 1) {
         return TAMANHO_INVALIDO;
     }
 
     int indice = posicao - 1;
 
-    if(vetorPrincipal[indice] != NULL){    
-        // a posicao pode já existir estrutura auxiliar
+    if (vetorPrincipal[indice] != NULL) {
         return JA_TEM_ESTRUTURA_AUXILIAR;
     }
 
-    vetorPrincipal[indice] = (int *)malloc(tamanho *sizeof(int));
-    if(vetorPrincipal[indice] == NULL){    
-        // o tamanho ser muito grande
+    vetorPrincipal[indice] = (int *)malloc(tamanho * sizeof(int));
+    if (vetorPrincipal[indice] == NULL) {
         return SEM_ESPACO_DE_MEMORIA;
-        }    
+    }
 
-    // deu tudo certo, crie
+    // Guardar o tamanho no primeiro índice da estrutura auxiliar
+    vetorPrincipal[indice][0] = tamanho; // Tamanho total
+    vetorPrincipal[indice][1] = 0;       // Quantidade de elementos preenchidos
+
     return SUCESSO;
 }
 
@@ -61,20 +59,27 @@ Rertono (int)
     POSICAO_INVALIDA - Posição inválida para estrutura auxiliar
 CONSTANTES
 */
-int inserirNumeroEmEstrutura(int posicao, int valor)
-{
-    if(posicao < 1 || posicao > 10){
-        // se posição é um valor válido {entre 1 e 10}
+int inserirNumeroEmEstrutura(int posicao, int valor) {
+    if (posicao < 1 || posicao > TAM) {
         return POSICAO_INVALIDA;
     }
 
     int indice = posicao - 1;
 
-    if(vetorPrincipal[indice] == NULL){    
-        // ainda não criou estrutura auxiliar
+    if (vetorPrincipal[indice] == NULL) {
         return SEM_ESTRUTURA_AUXILIAR;
     }
-    
+
+    int tamanho = vetorPrincipal[indice][0];
+    int qtdElementos = vetorPrincipal[indice][1];
+
+    if (qtdElementos >= tamanho) {
+        return SEM_ESPACO;
+    }
+
+    vetorPrincipal[indice][2 + qtdElementos] = valor;
+    vetorPrincipal[indice][1]++;
+
     return SUCESSO;
 }
 
@@ -89,10 +94,25 @@ Rertono (int)
     SEM_ESTRUTURA_AUXILIAR - Não tem estrutura auxiliar
     POSICAO_INVALIDA - Posição inválida para estrutura auxiliar
 */
-int excluirNumeroDoFinaldaEstrutura(int posicao)
-{
-    int retorno = SUCESSO;
-    return retorno;
+int excluirNumeroDoFinaldaEstrutura(int posicao) {
+    if (posicao < 1 || posicao > TAM) {
+        return POSICAO_INVALIDA;
+    }
+
+    int indice = posicao - 1;
+
+    if (vetorPrincipal[indice] == NULL) {
+        return SEM_ESTRUTURA_AUXILIAR;
+    }
+
+    int qtdElementos = vetorPrincipal[indice][1];
+
+    if (qtdElementos == 0) {
+        return ESTRUTURA_AUXILIAR_VAZIA;
+    }
+
+    vetorPrincipal[indice][1]--;
+    return SUCESSO;
 }
 
 /*
@@ -108,24 +128,40 @@ Rertono (int)
     POSICAO_INVALIDA - Posição inválida para estrutura auxiliar
 
 */
-int excluirNumeroEspecificoDeEstrutura(int posicao, int valor)
-{
-    int retorno = SUCESSO;
-    return retorno;
-}
-
-// se posição é um valor válido {entre 1 e 10}
-int ehPosicaoValida(int posicao)
-{
-    int retorno = 0;
-    if (posicao < 1 || posicao > 10)
-    {
-        retorno = POSICAO_INVALIDA;
+int excluirNumeroEspecificoDeEstrutura(int posicao, int valor) {
+    if (posicao < 1 || posicao > TAM) {
+        return POSICAO_INVALIDA;
     }
-    else
-        retorno = SUCESSO;
 
-    return retorno;
+    int indice = posicao - 1;
+
+    if (vetorPrincipal[indice] == NULL) {
+        return SEM_ESTRUTURA_AUXILIAR;
+    }
+
+    int qtdElementos = vetorPrincipal[indice][1];
+
+    if (qtdElementos == 0) {
+        return ESTRUTURA_AUXILIAR_VAZIA;
+    }
+
+    int i;
+    for (i = 0; i < qtdElementos; i++) {
+        if (vetorPrincipal[indice][2 + i] == valor) {
+            break;
+        }
+    }
+
+    if (i == qtdElementos) {
+        return NUMERO_INEXISTENTE;
+    }
+
+    for (; i < qtdElementos - 1; i++) {
+        vetorPrincipal[indice][2 + i] = vetorPrincipal[indice][2 + i + 1];
+    }
+
+    vetorPrincipal[indice][1]--;
+    return SUCESSO;
 }
 /*
 Objetivo: retorna os números da estrutura auxiliar da posição 'posicao (1..10)'.
